@@ -13,6 +13,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		hello()
 	})
+	http.HandleFunc("/maxitem", hackernews.maxitem)
 
 	http.ListenAndServe(":8080", nil)
 }
