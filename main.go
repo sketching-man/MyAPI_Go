@@ -27,6 +27,9 @@ func main() {
 	http.HandleFunc("/jobstories", hackernews.JobStories)
 	http.HandleFunc("/updates", hackernews.Updates)
 
+	http.HandleFunc("/item", hackernews.GetItem)
+	http.HandleFunc("/user", hackernews.GetUser)
+
 	// Start Server
 	http.ListenAndServe(":8080", nil)
 }
