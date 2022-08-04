@@ -6,15 +6,10 @@ A simple API supports anything I want / practice.
 # 1. 다른 API로부터 Json 데이터 받아서 넘기기
 
 Hackernews 데이터를 활용해보자.  
+http.Get(...) 함수로 []byte 형태의 데이터를 받았고, 이를 Map 형태로 변환 및 Json 형식으로 역반환하는 기능을 추가했다.  
 
-# 부록. Go에 대해서 몰랐던 부분들 적는 곳
+# 2. DB 접속해서 데이터 빼고 추가하기
 
-* 프로젝트 루트 디렉토리 기준으로 `mod init` 동작을 통해 `go.mod` 파일을 만들었을 때,  
-타 디렉토리의 패키지들은 전체 모듈 이름을 다 적고 나서 마지막에 폴더 이름을 적어야 정상적으로 import 할 수 있음.
-* 현재 패키지가 아닌 다른 패키지의 함수는 앞 글자가 대문자인 경우에만 export 됨.
+PostgreDB와 통신해서 데이터를 가져오고 저장해보자.
 
-# 부록. Go 관련 공부 사이트
-
-* http://golang.site/go/basics
-* https://yoongrammer.tistory.com/category/%EC%96%B8%EC%96%B4/Go%20%EC%96%B8%EC%96%B4
-* https://dev-yakuza.posstree.com/ko/golang/
+# 3. DataCrawler 만들어 보기
