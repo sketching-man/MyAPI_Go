@@ -249,7 +249,7 @@ func sum3(nums ...int) (count int, total int) {
 package main
  
 func main() {
-    sum := func(n ...int) int { //익명함수 정의
+    sum := func(n ...int) int { //익명 함수 정의
         s := 0
         for _, i := range n {
             s += i
@@ -257,7 +257,7 @@ func main() {
         return s
     }
  
-    result := sum(1, 2, 3, 4, 5) //익명함수 호출
+    result := sum(1, 2, 3, 4, 5) //익명 함수 호출
     println(result)
 }
 ```
@@ -281,7 +281,7 @@ func main() {
     r1 := calc(add, 10, 20)
     println(r1)
  
-    // 직접 첫번째 패러미터에 익명함수를 정의함
+    // 직접 첫번째 패러미터에 익명 함수를 정의함
     r2 := calc(func(x int, y int) int { return x - y }, 10, 20)
     println(r2)
  
@@ -397,9 +397,223 @@ s = append(s, 2)       // 0, 1, 2
 s = append(s, 3, 4, 5) // 0,1,2,3,4,5
 ```
 
+```
+// append slice
+sliceA := []int{1, 2, 3}
+sliceB := []int{4, 5, 6}
+sliceA = append(sliceA, sliceB...)  // [1 2 3 4 5 6]
+
+// copy slice
+source := []int{0, 1, 2}
+target := make([]int, len(source), cap(source)*2)
+copy(target, source)
+fmt.Println(target)  // [0 1 2 ] 출력
+```
+
 ### Map
 
+키(Key)에 대응하는 값(Value)을 신속히 찾는 해시테이블(Hash table)을 구현한 자료구조이다.  
+"map[Key타입]Value타입" 과 같이 선언할 수 있다.  
+
+```
+var idMap map[int]string        // map 변수 선언
+idMap = make(map[int]string)    // make로 map 생성
+
+// 리터럴을 사용한 초기화
+tickers := map[string]string{
+    "GOOG": "Google Inc",
+    "MSFT": "Microsoft",
+    "FB":   "FaceBook",
+}
+```
+
+```
+m := make(map[int]string)
+
+//추가 혹은 갱신
+m[901] = "Apple"
+m[134] = "Grape"
+m[777] = "Tomato"
+
+// 키에 대한 값 읽기
+str := m[134]
+
+noData := m[999] // 값이 없으면 nil 혹은 zero 리턴
+
+// 특정 키 삭제
+delete(m, 777)
+
+// map 키 체크
+val, exists := tickers["MSFT"]
+if !exists {
+    println("No MSFT ticker")
+}
+```
+
+```
+// for range 문을 사용하여 모든 맵 요소 출력
+// Map은 unordered 이므로 순서는 무작위
+for key, val := range myMap {
+    fmt.Println(key, val)
+}
+```
+
 ### Channel
+
+Channel은 데이터를 주고 받는 통로라 볼 수 있는데, channel은 make() 함수를 통해 미리 생성되어야 하며, channel 연산자 <- 을 통해 데이터를 보내고 받는다.  
+channel은 흔히 routine들 사이 데이터를 주고 받는데 사용되는데, 상대편이 준비될 때까지 channel에서 대기함으로써 별도의 lock을 걸지 않고 데이터를 동기화하는데 사용된다.  
+
+아래 예제에서 메인 함수는 마지막에서 channel로부터 데이터를 받고 있는데, 상대편 routine에서 데이터를 전송할 때까지는 계속 대기하게 된다. 따라서, 이 예제에서는 time.Sleep() 이나 fmt.Scanf() 같이 goroutine 이 끝날 때까지 기다리는 코드를 적지 않았다.
+
+```
+// 정수형 channel을 생성
+ch := make(chan int)
+
+go func() {
+    ch <- 123   // channel에 123을 보냄
+}()
+
+var i int
+i = <- ch  // channel로부터 123을 받음
+println(i)
+```
+
+ channel은 수신자와 송신자가 서로를 기다리는 속성이 있어, 이를 통해 routine 대기 시퀀스를 구현할 수 있다.  
+ 즉, 익명 함수를 사용한 한 Go 루틴에서 어떤 작업이 실행되고 있을 때, 메인루틴은 <-done 에서 계속 수신하며 대기하고 있게 된다.  
+ 익명 함수 Go 루틴에서 작업이 끝난 후, done channel에 true를 보내면, 수신자 메인루틴은 이를 받고 프로그램을 끝내게 된다.
+
+```
+// channel 생성
+done := make(chan bool)
+
+// routine 생성 + 시작
+go func() {
+    for i := 0; i < 10; i++ {
+        fmt.Println(i)
+    }
+    done <- true
+}()
+
+// 위의 routine이 끝날 때까지 대기
+<-done
+```
+
+2가지의 channel이 있는데, Unbuffered Channel과 Buffered Channel이 있다.  
+위의 예제에서의 channel은 Unbuffered Channel로서 이 channel에서는 하나의 수신자가 데이타를 받을 때까지 송신자가 데이타를 보내는 channel에 묶여 있게 된다.  
+하지만, Buffered Channel을 사용하면 비록 수신자가 받을 준비가 되어 있지 않을 지라도 지정된 버퍼만큼 데이타를 보내고 계속 다른 일을 수행할 수 있다.  
+
+```
+// Unbuffered Channel의 deadlock 상황
+func unbuffered() {
+  c := make(chan int)
+  c <- 1   // 수신자가 없으므로 deadlock
+  fmt.Println(<-c) // 여기까지 올 수 없음
+}
+
+// Buffered Channel의 deadlock 회피?
+func buffered() {
+    ch := make(chan int, 1)
+    ch <- 101     // 수신자가 없더라도 최대 버퍼 전까지는 넣고 넘어갈 수 있음
+    fmt.Println(<-ch)
+}
+```
+
+channel을 함수의 패러미터도 전달할 때 해당 channel로 송신만 할 것인지 혹은 수신만할 것인지를 지정할 수 있다.  
+송신 패러미터는 (p chan<- int)와 같이 chan<- 을 사용하고, 수신 패러미터는 (p <-chan int)와 같이 <-chan 을 사용한다.
+
+```
+func main() {
+    ch := make(chan string, 1)
+    sendChan(ch)
+    receiveChan(ch)
+}
+ 
+func sendChan(ch chan<- string) {
+    ch <- "Data"
+    // x := <-ch // 에러발생
+}
+ 
+func receiveChan(ch <-chan string) {
+    data := <-ch
+    fmt.Println(data)
+}
+```
+
+close()함수를 사용하여 channel을 닫을 수 있다.  
+channel이 닫힌 이후에도 계속 수신은 가능하다.
+
+```
+ch := make(chan int, 2)
+    
+// channel에 송신
+ch <- 1
+ch <- 2
+    
+// channel을 닫는다
+close(ch)
+
+// channel 수신
+println(<-ch)
+println(<-ch)
+    
+if _, success := <-ch; !success {
+    println("더이상 데이타 없음.")
+}
+```
+
+for range문을 사용하면 channel로부터 계속 수신하다가 channel이 닫힌 것을 감지하면 for 루프를 종료한다.
+
+```
+// 일반 반복문 사용
+for {
+    if i, success := <-ch; success {
+        println(i)
+    } else {
+        break
+    }
+}
+
+// range문 사용
+for i := range ch {
+    println(i)
+}
+```
+
+Go의 select문은 여러 개의 case문에서 각각 다른 channel을 기다리다가 준비가 된 channel case를 실행한다.  
+case channel들이 준비되지 않으면 계속 대기하고, 복수 channel에 신호가 오면 Go 런타임이 랜덤하게 그 중 한 개를 선택한다.  
+select문에 default 문이 있으면, case문 channel이 준비되지 않더라도 계속 대기하지 않고 바로 default문을 실행한다.
+
+```
+func main() {
+    done1 := make(chan bool)
+    done2 := make(chan bool)
+ 
+    go run1(done1)
+    go run2(done2)
+ 
+EXIT:
+    for {
+        select {
+            case <-done1:
+                println("run1 완료")
+    
+            case <-done2:
+                println("run2 완료")
+                break EXIT
+        }
+    }
+}
+ 
+func run1(done chan bool) {
+    time.Sleep(1 * time.Second)
+    done <- true
+}
+ 
+func run2(done chan bool) {
+    time.Sleep(2 * time.Second)
+    done <- true
+}
+```
 
 ### new vs make
 
@@ -421,6 +635,75 @@ fmt.Printf"(%T %#v", m, m) // *main.MyType &amp;main.MyType{}
 make()의 경우 slice, map, channel 만으로 사용처가 한정되어 있는데, 이 세 자료구조가 내부 데이터 구조를 가지기 때문이다.  
 Effective Go 에서는 new()는 초기화를 하지 않는, 즉 제로 값이 되는 것에 대해 helpful 하다고 언급 했다.  
 이 세 자료구조는 단순히 제로 값으로 초기화하는 것으로는 사용이 불가하기 때문에, make() 동작으로 내부 이니셜라이즈를 진행해줘야 한다.
+
+## Go Routine
+
+Go 루틴(routine)은 Go 런타임이 관리하는 Lightweight 논리적(혹은 가상적) thread다.  
+"go" 키워드를 사용하여 함수를 호출하면, 런타임시 새로운 goroutine을 실행한다.  
+routine은 비동기적으로(asynchronously) 함수를 실행하므로, 여러 코드를 동시에(Concurrently) 실행하는데 사용된다.  
+
+routine은 OS thread보다 훨씬 가볍게 Concurrent 처리를 구현하기 위하여 만든 것으로, 기본적으로 Go 런타임이 자체 관리한다.  
+Go 런타임 상에서 관리되는 작업단위인 여러 routine들은 종종 하나의 OS thread 1개로도 실행되곤 한다.  
+즉, routine들은 OS thread와 1 대 1로 대응되지 않고, Multiplexing으로 훨씬 적은 OS thread를 사용한다.  
+메모리 측면에서도 OS thread가 1 메가바이트의 스택을 갖는 반면, routine은 이보다 훨씬 작은 몇 킬로바이트의 스택을 갖는다(필요시 동적으로 증가).  
+Go 런타임은 routine을 관리하면서 channel을 통해 routine 간의 통신을 쉽게 할 수 있도록 하였다.
+
+```
+func say(s string) {
+    for i := 0; i < 10; i++ {
+        fmt.Println(s, "***", i)
+    }
+}
+ 
+func main() {
+    // 함수를 동기적으로 실행
+    say("Sync")
+ 
+    // 함수를 비동기적으로 실행
+    go say("Async1")
+    go say("Async2")
+    go say("Async3")
+ 
+    // 3초 대기
+    time.Sleep(time.Second * 3)
+}
+```
+
+아래 예제에서는 익명 함수를 통해 routine을 실행시킨다.  
+여기서 sync.WaitGroup을 사용하고 있는데, 이는 기본적으로 여러 routine들이 끝날 때까지 기다리는 역할을 한다.  
+WaitGroup을 사용하기 위해서는 먼저 Add() 메소드에 몇 개의 routine을 기다릴 것인지 지정하고, 각 routine에서 Done() 메서드를 호출한다 (여기서는 defer 를 사용하였다).  
+그리고 메인 함수에서는 Wait() 메서드를 호출하여, routine들이 모두 끝나기를 기다린다.
+
+```
+func main() {
+    // WaitGroup 생성. 2개의 routine을 기다림.
+    var wait sync.WaitGroup
+    wait.Add(2)
+ 
+    // 익명 함수를 사용한 routine
+    go func() {
+        defer wait.Done() //끝나면 .Done() 호출
+        fmt.Println("Hello")
+    }()
+ 
+    // 익명 함수에 패러미터 전달
+    go func(msg string) {
+        defer wait.Done() //끝나면 .Done() 호출
+        fmt.Println(msg)
+    }("Hi")
+ 
+    wait.Wait() // routine을 두 개 끝날 때까지 대기
+}
+```
+
+Go는 디폴트로 1개의 CPU를 사용한다.  
+즉, 여러 개의 routine을을 만들더라도, 1개의 CPU에서 작업을 시분할하여 처리한다 (Concurrent 처리).  
+만약 머신이 복수개의 CPU를 가진 경우, Go 프로그램을 다중 CPU에서 병렬처리 (Parallel 처리)하게 할 수 있는데, 병렬처리를 위해서는 아래와 같이 runtime.GOMAXPROCS(CPU수) 함수를 호출하여야 한다 (여기서 CPU 수는 Logical CPU 수를 가리킨다).
+
+```
+// 4개의 CPU 사용
+runtime.GOMAXPROCS(4)
+```
 
 # Go Tips
 
