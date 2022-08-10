@@ -705,6 +705,98 @@ Go는 디폴트로 1개의 CPU를 사용한다.
 runtime.GOMAXPROCS(4)
 ```
 
+## Go 패키지
+
+Go는 패키지를 사용해서 작은 단위의 컴포넌트를 작성하고, 이러한 작은 패키지들을 활용해서 프로그램을 작성할 것을 권장한다.  
+공식 라이브러리도 패키지 형태로 제공한다(표준 라이브러리 패키지).  
+특정 패키지의 함수, 구조체, 인터페이스, 메서드를 사용하고 싶다면 해당 패키지의 import가 필요하다.  
+현재 패키지의 함수, 구조체, 인터페이스, 메서드를 다른 패키지에서 사용 가능하게 만들고 싶다면 첫문자를 대문자로 시작함으로써 public 으로 사용할 수 있다.  
+
+```
+package main    // 현재 패키지 선언
+ 
+import "fmt"    // import 할 패키지 선언
+ 
+func main(){
+ fmt.Println("Hello")   // import한 패키지에서 기능 사용
+}
+```
+
+"main" 이라고 명명된 패키지를 발견하면 컴파일러는 해당 패키지를 공유 라이브러리가 아닌 실행(executable) 프로그램으로 만든다.  
+그리고 이 main 패키지 안의 main() 함수가 프로그램의 Entry Point가 된다.  
+
+패키지가 import 되고 최초로 호출될 때 호출되는 init() 함수를 작성할 수 있다.  
+즉, init 함수는 패키지가 로드되면서 실행되는 함수로 별도의 호출 없이 자동으로 호출된다.  
+패키지를 import 하면서 바로 init() 함수를 호출하고 싶다면 앞에 _ 를 붙인다.  
+
+```
+package testlib
+ 
+var pop map[string]string
+ 
+func init() {   // 패키지 사용 시 map 초기화
+    pop = make(map[string]string)
+}
+```
+
+```
+package main
+import _ "other/xlib"   // 패키지 import 시 init() 호출
+```
+
+사용자 정의 라이브러리 패키지는 일반적으로 폴더를 하나 만들고 그 폴더 안에 .go 파일들을 만들어 구성한다.  
+하나의 서브 폴더안에 있는 .go 파일들은 동일한 패키지명을 가지며, 패키지명은 해당 폴더의 이름과 같게 한다.  
+즉, 해당 폴더에 있는 여러 *.go 파일들은 하나의 패키지로 묶인다.
+
+## Go 구조체
+
+구조체는 필드의 집합체, 컨테이너이다.  
+Go에서 struct는 필드 데이타만을 가지며, 메서드를 갖지 않는다.  
+struct를 정의하기 위해서는 Custom Type을 정의하는데 사용하는 type 문을 사용한다.
+
+```
+// struct 정의
+type person struct {
+    name string
+    age  int
+}
+
+func main() {
+    // person 객체 생성
+    p := person{}
+     
+    // 필드값 설정
+    p.name = "Lee"
+    p.age = 10
+}
+```
+
+```
+// 생성과 동시에 내부 정보 기입
+var p1 person 
+p1 = person{"Bob", 20}
+
+p2 := person{name: "Sean", age: 50}
+```
+
+```
+// new로 생성
+p := new(person)
+p.name = "Lee"  // p가 포인터라도 . 을 사용
+```
+
+## Go 메서드
+
+To be written!
+
+## Go 인터페이스
+
+To be written!
+
+## Go defer, panic, recover
+
+To be written!
+
 # Go Tips
 
 * 프로젝트 루트 디렉토리 기준으로 `mod init` 동작을 통해 `go.mod` 파일을 만들었을 때,  
