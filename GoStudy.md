@@ -787,7 +787,44 @@ p.name = "Lee"  // p가 포인터라도 . 을 사용
 
 ## Go 메서드
 
-To be written!
+Go 언어에서는 struct가 필드만을 가지며, 메서드는 별도로 분리되어 정의된다.  
+메서드는 함수 정의에서 func 키워드와 함수명 사이에 "그 함수가 어떤 struct를 위한 메서드인지"를 표시하게 되고,  
+struct 변수명은 함수 내에서 마치 입력 파라미터처럼 사용되는데, 이를 receiver라 칭한다.
+
+```
+//Rect struct 정의
+type Rect struct {
+    width, height int
+}
+ 
+//Rect의 area() 메서드 정의
+func (r Rect) area() int {      // 어떤 struct의 메서드인지 r Rect 형태로 적음
+    return r.width * r.height   // 함수 내부에서 r로 self 객체를 호출
+}
+ 
+func main() {
+    rect := Rect{10, 20}    // struct 생성
+    area := rect.area()     // struct의 메서드 호출
+}
+```
+
+Receiver는 Value와 Reference 형태로 전달이 가능하다.  
+Pass by value일 경우 struct의 데이타를 복사하여 전달하기 때문에 메서드내에서 그 struct의 필드값이 변경되더라도 호출자의 데이타는 변경되지 않는다.  
+Pass by reference일 경우 struct의 실 메모리 상 주소를 전달하기 때문에 메서드내에서 그 struct의 필드값이 변경되면 호출자의 데이타가 변경된다.
+
+```
+// 포인터 Receiver
+func (r *Rect) area2() int {
+    r.width++
+    return r.width * r.height
+}
+ 
+func main() {
+    rect := Rect{10, 20}
+    area := rect.area2()        // 메서드 호출
+    println(rect.width, area)   // 11 220 출력
+}
+```
 
 ## Go 인터페이스
 
