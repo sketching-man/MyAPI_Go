@@ -828,11 +828,165 @@ func main() {
 
 ## Go 인터페이스
 
-To be written!
+struct가 필드들의 집합체라면, interface는 메서드들의 집합체이다.  
+interface는 타입(type)이 구현해야 하는 메서드 원형(prototype)들을 정의한다.  
+이후에 해당 interface를 구현하는 메서드에서 내용을 작성한다.  
+
+```
+// Shape 인터페이스 정의
+type Shape interface {
+    area() float64
+    perimeter() float64
+}
+
+// Rect 정의
+type Rect struct {
+    width, height float64
+}
+ 
+// Circle 정의
+type Circle struct {
+    radius float64
+}
+ 
+//Rect 타입에 대한 Shape 인터페이스 구현 
+func (r Rect) area() float64 { return r.width * r.height }
+func (r Rect) perimeter() float64 {
+     return 2 * (r.width + r.height)
+}
+ 
+//Circle 타입에 대한 Shape 인터페이스 구현 
+func (c Circle) area() float64 { 
+    return math.Pi * c.radius * c.radius
+}
+func (c Circle) perimeter() float64 { 
+    return 2 * math.Pi * c.radius
+}
+```
+
+함수 파라미터가 interface 인 경우, 이는 어떤 타입이든 해당 인터페이스를 구현하기만 하면 모두 입력 파라미터로 사용될 수 있다는 것을 의미한다.  
+
+```
+func main() {
+    r := Rect{10., 20.}
+    c := Circle{10}
+ 
+    showArea(r, c)
+}
+ 
+func showArea(shapes ...Shape) {
+    for _, s := range shapes {
+        a := s.area() //인터페이스 메서드 호출
+        println(a)
+    }
+}
+```
+
+모든 Type을 나타내기 위해 빈 인터페이스를 사용한다.  
+즉, 빈 인터페이스는 어떠한 타입도 담을 수 있는 컨테이너라고 볼 수 있으며, 여러 다른 언어에서 흔히 일컫는 Dynamic Type 이라고 볼 수 있다.  
+(empty interface는 C#, Java 에서 object, C/C++ 에서는 void*)
+
+```
+func main() {
+    var x interface{}
+    x = 1 
+    x = "Tom"
+ 
+    printIt(x)
+}
+ 
+func printIt(v interface{}) {
+    fmt.Println(v) //Tom
+}
+```
+
+Interface x와 타입 T에 대하여 x.(T)로 표현했을 때, 이는 x가 nil이 아니며, x는 T 타입에 속한다는 점을 확인(assert)하는 것으로 이러한 표현을 "Type Assertion"이라 부른다.
+
+```
+var a interface{} = 1
+ 
+i := a       // a와 i 는 dynamic type, 값은 1
+j := a.(int) // j는 int 타입, 값은 1
+
+println(i)  // 포인터주소 출력
+println(j)  // 1 출력
+```
 
 ## Go defer, panic, recover
 
-To be written!
+defer 키워드는 특정 문장 혹은 함수를 나중에 (defer를 호출하는 함수가 리턴하기 직전에) 실행하게 한다.  
+일반적으로 defer는 C#, Java 같은 언어에서의 finally 블럭처럼 마지막에 Clean-up 작업을 위해 사용된다.  
+
+```
+func main() {
+    f, err := os.Open("1.txt")
+    if err != nil {
+        panic(err)
+    }
+ 
+    // main 마지막에 파일 close 실행
+    defer f.Close()
+ 
+    // f를 활용한 작업, 파일 읽기
+    bytes := make([]byte, 1024)
+    f.Read(bytes)
+    println(len(bytes))
+}
+```
+
+panic() 함수는 현재 함수를 즉시 멈추고 현재 함수에 defer 함수들을 모두 실행한 후 즉시 리턴한다.  
+이러한 panic 모드 실행 방식은 다시 상위함수에도 똑같이 적용되고, 계속 콜스택을 타고 올라가며 적용된다.  
+그리고 마지막에는 프로그램이 에러를 내고 종료하게 된다.
+
+```
+func main() {
+    // 잘못된 파일명을 넣음
+    openFile("Invalid.txt")
+     
+    // openFile() 안에서 panic이 실행되면
+    // 아래 println 문장은 실행 안됨
+    // panic의 즉시 리턴이 위에서 적용되기 때문
+    println("Done")
+}
+ 
+func openFile(fn string) {
+    f, err := os.Open(fn)
+    if err != nil {
+        panic(err)
+    }
+ 
+    defer f.Close()
+}
+```
+
+recover()함수는 panic 함수에 의한 패닉상태를 다시 정상상태로 되돌리는 함수이다. 
+
+```
+func main() {
+    // 잘못된 파일명을 넣음
+    openFile("Invalid.txt")
+ 
+    // recover에 의해
+    // 이 문장 실행됨
+    println("Done") 
+}
+ 
+func openFile(fn string) {
+    // recover 함수를 defer로 걸어둠. panic 호출시 실행
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("OPEN ERROR", r)
+        }
+    }()
+ 
+    f, err := os.Open(fn)
+    if err != nil {
+        panic(err)
+    }
+ 
+    defer f.Close()
+}
+```
 
 # Go Tips
 
