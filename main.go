@@ -18,18 +18,29 @@ func main() {
 	})
 
 	// Route Mapping
-	http.HandleFunc("/maxitem", hackernews.MaxItem)
-	http.HandleFunc("/topstories", hackernews.TopStories)
-	http.HandleFunc("/newstories", hackernews.NewStories)
-	http.HandleFunc("/beststories", hackernews.BestStories)
-	http.HandleFunc("/askstories", hackernews.AskStories)
-	http.HandleFunc("/showstories", hackernews.ShowStories)
-	http.HandleFunc("/jobstories", hackernews.JobStories)
-	http.HandleFunc("/updates", hackernews.Updates)
-
-	http.HandleFunc("/item", hackernews.GetItem)
-	http.HandleFunc("/user", hackernews.GetUser)
+	mapRoutes()
 
 	// Start Server
 	http.ListenAndServe(":8080", nil)
+}
+
+func mapRoutes() {
+	// region: Hackernews related
+	http.HandleFunc("/hackernews/maxitem", hackernews.MaxItem)
+	http.HandleFunc("/hackernews/topstories", hackernews.TopStories)
+	http.HandleFunc("/hackernews/newstories", hackernews.NewStories)
+	http.HandleFunc("/hackernews/beststories", hackernews.BestStories)
+	http.HandleFunc("/hackernews/askstories", hackernews.AskStories)
+	http.HandleFunc("/hackernews/showstories", hackernews.ShowStories)
+	http.HandleFunc("/hackernews/jobstories", hackernews.JobStories)
+	http.HandleFunc("/hackernews/updates", hackernews.Updates)
+
+	http.HandleFunc("/hackernews/item", hackernews.GetItem)
+	http.HandleFunc("/hackernews/user", hackernews.GetUser)
+	// endregion
+
+	// region: myBoard related
+	http.HandleFunc("/myboard/api/article", nil)
+	http.HandleFunc("/myboard/api/member", nil)
+	// endregion
 }
