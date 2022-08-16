@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/sketching-man/MyAPI_Go/module/hackernews"
+	"github.com/sketching-man/MyAPI_Go/module/myboard"
 )
 
 func hello() {
@@ -25,22 +27,31 @@ func main() {
 }
 
 func mapRoutes() {
-	// region: Hackernews related
-	http.HandleFunc("/hackernews/maxitem", hackernews.MaxItem)
-	http.HandleFunc("/hackernews/topstories", hackernews.TopStories)
-	http.HandleFunc("/hackernews/newstories", hackernews.NewStories)
-	http.HandleFunc("/hackernews/beststories", hackernews.BestStories)
-	http.HandleFunc("/hackernews/askstories", hackernews.AskStories)
-	http.HandleFunc("/hackernews/showstories", hackernews.ShowStories)
-	http.HandleFunc("/hackernews/jobstories", hackernews.JobStories)
-	http.HandleFunc("/hackernews/updates", hackernews.Updates)
+	router := mux.NewRouter()
 
-	http.HandleFunc("/hackernews/item", hackernews.GetItem)
-	http.HandleFunc("/hackernews/user", hackernews.GetUser)
+	// region: Hackernews related
+	router.HandleFunc("/hackernews/maxitem", hackernews.MaxItem).Methods("GET")
+	router.HandleFunc("/hackernews/topstories", hackernews.TopStories).Methods("GET")
+	router.HandleFunc("/hackernews/newstories", hackernews.NewStories).Methods("GET")
+	router.HandleFunc("/hackernews/beststories", hackernews.BestStories).Methods("GET")
+	router.HandleFunc("/hackernews/askstories", hackernews.AskStories).Methods("GET")
+	router.HandleFunc("/hackernews/showstories", hackernews.ShowStories).Methods("GET")
+	router.HandleFunc("/hackernews/jobstories", hackernews.JobStories).Methods("GET")
+	router.HandleFunc("/hackernews/updates", hackernews.Updates).Methods("GET")
+
+	router.HandleFunc("/hackernews/item", hackernews.GetItem).Methods("GET")
+	router.HandleFunc("/hackernews/user", hackernews.GetUser).Methods("GET")
 	// endregion
 
 	// region: myBoard related
-	http.HandleFunc("/myboard/api/article", nil)
-	http.HandleFunc("/myboard/api/member", nil)
+	router.HandleFunc("/myboard/api/member", myboard.CreateMember).Methods("POST")
+	router.HandleFunc("/myboard/api/member", myboard.ReadMember).Methods("GET")
+	router.HandleFunc("/myboard/api/member", myboard.UpdateMember).Methods("PUT")
+	router.HandleFunc("/myboard/api/member", myboard.DeleteMember).Methods("DELETE")
+	router.HandleFunc("/myboard/api/article", myboard.CreateArticle).Methods("POST")
+	router.HandleFunc("/myboard/api/article", myboard.ReadArticle).Methods("GET")
+	router.HandleFunc("/myboard/api/article", myboard.UpdateArticle).Methods("PUT")
+	router.HandleFunc("/myboard/api/article", myboard.DeleteArticle).Methods("DELETE")
+
 	// endregion
 }
