@@ -20,13 +20,15 @@ func main() {
 	})
 
 	// Route Mapping
-	mapRoutes()
+	router := mapRoutes()
 
 	// Start Server
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", router)
+
+	defer myboard.Close()
 }
 
-func mapRoutes() {
+func mapRoutes() *mux.Router {
 	router := mux.NewRouter()
 
 	// region: Hackernews related
@@ -52,6 +54,7 @@ func mapRoutes() {
 	router.HandleFunc("/myboard/api/article", myboard.ReadArticle).Methods("GET")
 	router.HandleFunc("/myboard/api/article", myboard.UpdateArticle).Methods("PUT")
 	router.HandleFunc("/myboard/api/article", myboard.DeleteArticle).Methods("DELETE")
-
 	// endregion
+
+	return router
 }
