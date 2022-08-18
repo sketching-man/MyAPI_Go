@@ -2,6 +2,7 @@ package myboard
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -40,26 +41,37 @@ func CreateMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadMember(w http.ResponseWriter, r *http.Request) {
-	queryString := "SELECT * FROM public.member"
+	params, ok := r.URL.Query()["id"]
+	if !ok || 1 > len(params[0]) {
+		return
+	}
 
+	queryString := fmt.Sprintf("SELECT * FROM member WHERE id=%s", params[0])
 	rows, err := db.Query(queryString)
 	if nil != err {
 		panic(err)
 	}
 	defer rows.Close()
 
-	var id int64
-	var grade int
-	var password string
-	var username string
+	members := []member{}
 	for rows.Next() {
-		err := rows.Scan(&id, &grade, &password, &username)
+		var member member
+
+		err := rows.Scan(&member.Id, &member.Grade, &member.Password, &member.Username)
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println(id, grade, password, username)
+		members = append(members, member)
 	}
+
+	result, err := json.Marshal(members)
+	if nil != err {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
 }
 
 func UpdateMember(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +87,38 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadArticle(w http.ResponseWriter, r *http.Request) {
+	params, ok := r.URL.Query()["id"]
+	if !ok || 1 > len(params[0]) {
+		return
+	}
 
+	queryString := fmt.Sprintf("SELECT * FROM article WHERE id=%s", params[0])
+
+	rows, err := db.Query(queryString)
+	if nil != err {
+		panic(err)
+	}
+	defer rows.Close()
+
+	articles := []article{}
+	for rows.Next() {
+		var article article
+
+		err := rows.Scan(&article.Id, &article.Body, &article.Title, &article.WrittenTime, &article.WriterId)
+		if err != nil {
+			panic(err)
+		}
+
+		articles = append(articles, article)
+	}
+
+	result, err := json.Marshal(articles)
+	if nil != err {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
 }
 
 func UpdateArticle(w http.ResponseWriter, r *http.Request) {
