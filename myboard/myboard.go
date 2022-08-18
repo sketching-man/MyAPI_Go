@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -21,7 +22,9 @@ var (
 )
 
 func init() {
-	dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_USER, DB_PW, DB_NAME)
+	dbinfo := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		DB_HOST, DB_USER, DB_PW, DB_NAME)
 
 	var err error
 	db, err = sql.Open("postgres", dbinfo)
@@ -37,7 +40,19 @@ func Close() {
 }
 
 func CreateMember(w http.ResponseWriter, r *http.Request) {
+	var member member
+	err := json.NewDecoder(r.Body).Decode(&member)
+	if nil != err {
+		panic(err)
+	}
 
+	queryResult, err := db.Exec(
+		"INSERT INTO member(grade, password, user_name) VALUES ($1, $2, $3);",
+		member.Grade, member.Password, member.Username)
+	if nil != err {
+		fmt.Println(queryResult)
+		panic(err)
+	}
 }
 
 func ReadMember(w http.ResponseWriter, r *http.Request) {
@@ -46,8 +61,7 @@ func ReadMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queryString := fmt.Sprintf("SELECT * FROM member WHERE id=%s", params[0])
-	rows, err := db.Query(queryString)
+	rows, err := db.Query("SELECT * FROM member WHERE id=$1;", params[0])
 	if nil != err {
 		panic(err)
 	}
@@ -83,7 +97,19 @@ func DeleteMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
+	var article article
+	err := json.NewDecoder(r.Body).Decode(&article)
+	if nil != err {
+		panic(err)
+	}
 
+	queryResult, err := db.Exec(
+		"INSERT INTO article(body, title, written_time, writer_id) VALUES ($1, $2, $3, $4)",
+		article.Body, article.Title, time.Now(), article.WriterId)
+	if nil != err {
+		fmt.Println(queryResult)
+		panic(err)
+	}
 }
 
 func ReadArticle(w http.ResponseWriter, r *http.Request) {
@@ -92,9 +118,7 @@ func ReadArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queryString := fmt.Sprintf("SELECT * FROM article WHERE id=%s", params[0])
-
-	rows, err := db.Query(queryString)
+	rows, err := db.Query("SELECT * FROM article WHERE id=$1", params[0])
 	if nil != err {
 		panic(err)
 	}
