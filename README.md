@@ -13,5 +13,3 @@ http.Get(...) 함수로 []byte 형태의 데이터를 받았고, 이를 Map 형�
 PostgreDB와 통신해서 데이터를 가져오고 저장해보자.
 
 # 3. DataCrawler 만들어 보기
-
-https://modu-print.tistory.com/444 링크 참조하면서 공부 중!
