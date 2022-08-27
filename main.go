@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/sketching-man/MyAPI_Go/module/hackernews"
 	"github.com/sketching-man/MyAPI_Go/module/myboard"
+	"github.com/sketching-man/MyAPI_Go/module/webcrawler"
 )
 
 func hello() {
@@ -14,18 +14,19 @@ func hello() {
 }
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		hello()
-		w.Write([]byte("hello, world"))
-	})
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	hello()
+	// 	w.Write([]byte("hello, world"))
+	// })
 
-	// Route Mapping
-	router := mapRoutes()
+	// // Route Mapping
+	// router := mapRoutes()
 
-	// Start Server
-	http.ListenAndServe(":8080", router)
+	// // Start Server
+	// http.ListenAndServe(":8080", router)
 
-	defer myboard.Close()
+	// defer myboard.Close()
+	webcrawler.CrawlTest()
 }
 
 func mapRoutes() *mux.Router {
