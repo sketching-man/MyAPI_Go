@@ -26,7 +26,7 @@ func main() {
 	// http.ListenAndServe(":8080", router)
 
 	// defer myboard.Close()
-	webcrawler.CrawlTest()
+	webcrawler.Start()
 }
 
 func mapRoutes() *mux.Router {

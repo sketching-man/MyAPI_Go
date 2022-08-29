@@ -3,41 +3,38 @@ package webcrawler
 import (
 	"fmt"
 	"net/http"
-	"strings"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
-func CrawlTest() {
-	resp, err := http.Get("https://news.ycombinator.com/news")
-	if nil != err {
-		// do something
-	}
-	defer resp.Body.Close()
-
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if nil != err {
-		// do something
-	}
-
-	f := func(i int, s *goquery.Selection) bool {
-		link, _ := s.Attr("href")
-		return strings.HasPrefix(link, "https")
-	}
-
-	doc.Find("body a").FilterFunction(f).Each(
-		func(_ int, tag *goquery.Selection) {
-			link, _ := tag.Attr("href")
-			linkText := tag.Text()
-			fmt.Printf("%s %s\n", linkText, link)
-		})
-}
+// func CrawlTest() {
+// 	resp, err := http.Get("https://news.ycombinator.com/news")
+// 	if nil != err {
+// 		// do something
+// 	}
+// 	defer resp.Body.Close()
+//
+// 	doc, err := goquery.NewDocumentFromReader(resp.Body)
+// 	if nil != err {
+// 		// do something
+// 	}
+//
+// 	f := func(i int, s *goquery.Selection) bool {
+// 		link, _ := s.Attr("href")
+// 		return strings.HasPrefix(link, "https")
+// 	}
+//
+// 	doc.Find("body a").FilterFunction(f).Each(
+// 		func(_ int, tag *goquery.Selection) {
+// 			link, _ := tag.Attr("href")
+// 			linkText := tag.Text()
+// 			fmt.Printf("%s %s\n", linkText, link)
+// 		})
+// }
 
 func Fetch(url string) {
 	// Get HTML from a website
 	resp, err := http.Get(url)
 	if nil != err {
-		// do something
+		fmt.Println(err)
 	}
 	defer resp.Body.Close()
 
@@ -49,10 +46,13 @@ func Fetch(url string) {
 		return
 	}
 
-	// Get body and <a>s from the parsed document
+	// Get body from the parsed document and save to DB
 	if FilterAndSaveContent(doc) {
 		return
 	}
 
+	// Get links from the parsed document and renew frontier queue
 	links := FilterAndGetLinks(doc)
+	DropDuplicatedUrls(&links)
+	EnqueueUrls(&links)
 }

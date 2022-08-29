@@ -2,7 +2,7 @@ package webcrawler
 
 import "github.com/PuerkitoBio/goquery"
 
-func CheckDuplication(doc *goquery.Document) bool {
+func FilterAndSaveContent(doc *goquery.Document) bool {
 	return false
 }
 
