@@ -32,3 +32,27 @@ func CrawlTest() {
 			fmt.Printf("%s %s\n", linkText, link)
 		})
 }
+
+func Fetch(url string) {
+	// Get HTML from a website
+	resp, err := http.Get(url)
+	if nil != err {
+		// do something
+	}
+	defer resp.Body.Close()
+
+	// Parse a website
+	doc := ParseDocument(&resp.Body)
+
+	// Check if a website is duplicated
+	if CheckDuplication(doc) {
+		return
+	}
+
+	// Get body and <a>s from the parsed document
+	if FilterAndSaveContent(doc) {
+		return
+	}
+
+	links := FilterAndGetLinks(doc)
+}
