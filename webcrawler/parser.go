@@ -1,7 +1,6 @@
 package webcrawler
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/PuerkitoBio/goquery"
@@ -10,7 +9,7 @@ import (
 func ParseDocument(htmlBody *io.ReadCloser) *goquery.Document {
 	doc, err := goquery.NewDocumentFromReader(*htmlBody)
 	if nil != err {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	return doc

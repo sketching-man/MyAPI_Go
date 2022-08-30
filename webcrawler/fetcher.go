@@ -1,7 +1,7 @@
 package webcrawler
 
 import (
-	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -34,9 +34,14 @@ func Fetch(url string) {
 	// Get HTML from a website
 	resp, err := http.Get(url)
 	if nil != err {
-		fmt.Println(err)
+		panic(err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
 
 	// Parse a website
 	doc := ParseDocument(&resp.Body)
@@ -47,9 +52,7 @@ func Fetch(url string) {
 	}
 
 	// Get body from the parsed document and save to DB
-	if FilterAndSaveContent(doc) {
-		return
-	}
+	FilterAndSaveContent(doc)
 
 	// Get links from the parsed document and renew frontier queue
 	links := FilterAndGetLinks(doc)
