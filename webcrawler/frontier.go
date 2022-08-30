@@ -12,7 +12,7 @@ var seedUrlList [2]string = [2]string{
 }
 var urlQueue datastructure.Queue
 
-func Start() {
+func StartCrawling() {
 	urlQueue = *datastructure.NewQueue()
 
 	for _, url := range seedUrlList {

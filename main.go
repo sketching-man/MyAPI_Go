@@ -27,6 +27,7 @@ func main() {
 
 	// defer myboard.Close()
 	webcrawler.Start()
+	webcrawler.Close()
 }
 
 func mapRoutes() *mux.Router {
