@@ -56,6 +56,6 @@ func Fetch(url string) {
 
 	// Get links from the parsed document and renew frontier queue
 	links := FilterAndGetLinks(doc)
-	DropDuplicatedUrls(&links)
-	EnqueueUrls(&links)
+	DropDuplicatedUrls(links)
+	EnqueueUrls(links)
 }

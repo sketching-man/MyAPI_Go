@@ -1,5 +1,5 @@
 package webcrawler
 
-func DropDuplicatedUrls(urls *[]string) {
+func DropDuplicatedUrls(urls *map[string]string) {
 
 }

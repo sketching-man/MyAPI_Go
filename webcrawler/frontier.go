@@ -39,8 +39,8 @@ func run(wait *sync.WaitGroup, urlQueue *datastructure.Queue) {
 	}
 }
 
-func EnqueueUrls(urls *[]string) {
-	for _, url := range *urls {
-		urlQueue.Push(url)
+func EnqueueUrls(urls *map[string]string) {
+	for link, _ := range *urls {
+		urlQueue.Push(link)
 	}
 }
