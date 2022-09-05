@@ -4,15 +4,32 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"strings"
+	"time"
 )
 
-func FilterAndSaveContent(doc *goquery.Document) {
-	doc.Find("h1").Each(
+func FilterAndSaveContent(url string, doc *goquery.Document) {
+	var title string
+	doc.Find("head title").Each(
 		func(_ int, selection *goquery.Selection) {
-			header := selection.Text()
-			fmt.Println(header)
+			title = selection.Text()
 		},
 	)
+
+	queryResult, err := db.Exec(
+		"INSERT INTO documents(url, title, \"timestamp\") VALUES ($1, $2, $3)",
+		url, title, time.Now())
+	if nil != err {
+		fmt.Println(queryResult)
+		panic(err)
+	}
+
+	queryResult, err = db.Exec(
+		"INSERT INTO docRecord(hash) VALUES ($1)",
+		getContentHash(doc))
+	if nil != err {
+		fmt.Println(queryResult)
+		panic(err)
+	}
 }
 
 func FilterAndGetLinks(doc *goquery.Document) *map[string]string {

@@ -52,7 +52,7 @@ func Fetch(url string) {
 	}
 
 	// Get body from the parsed document and save to DB
-	FilterAndSaveContent(doc)
+	FilterAndSaveContent(url, doc)
 
 	// Get links from the parsed document and renew frontier queue
 	links := FilterAndGetLinks(doc)
