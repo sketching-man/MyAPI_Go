@@ -6,16 +6,27 @@ import (
 	"hash/fnv"
 )
 
-func CheckDuplication(doc *goquery.Document) bool {
-	hash := getContentHash(doc)
-
+func CheckDuplication(url string, doc *goquery.Document) bool {
 	var exists bool
+	// region Content check with hash
+	//hash := getContentHash(doc)
+	//
+	//err := db.QueryRow(
+	//	"SELECT COUNT(*) FROM \"docRecord\" WHERE hash=$1",
+	//	hash).Scan(&exists)
+	//if err != nil {
+	//	panic(err)
+	//}
+	// endregion
+
+	// region Content check with url
 	err := db.QueryRow(
-		"SELECT COUNT(*) FROM \"docRecord\" WHERE hash=$1",
-		hash).Scan(&exists)
+		"SELECT COUNT(*) FROM \"documents\" WHERE url=$1",
+		url).Scan(&exists)
 	if err != nil {
 		panic(err)
 	}
+	// endregion
 
 	return exists
 }

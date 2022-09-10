@@ -6,9 +6,9 @@ import (
 	"github.com/sketching-man/MyAPI_Go/module/datastructure"
 )
 
-var seedUrlList [2]string = [2]string{
-	"https://news.ycombinator.com/news",
-	"https://www.bbc.com/news",
+var seedUrlList = [1]string{
+	//"https://news.ycombinator.com/news",
+	"https://www.bbc.com/news/world-europe-62735271",
 }
 var urlQueue datastructure.Queue
 
@@ -40,7 +40,7 @@ func run(wait *sync.WaitGroup, urlQueue *datastructure.Queue) {
 }
 
 func EnqueueUrls(urls *map[string]string) {
-	for link, _ := range *urls {
+	for link := range *urls {
 		urlQueue.Push(link)
 	}
 }

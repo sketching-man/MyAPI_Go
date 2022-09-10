@@ -47,7 +47,7 @@ func Fetch(url string) {
 	doc := ParseDocument(&resp.Body)
 
 	// Check if a website is duplicated
-	if CheckDuplication(doc) {
+	if CheckDuplication(url, doc) {
 		return
 	}
 

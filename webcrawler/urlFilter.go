@@ -23,13 +23,37 @@ func FilterAndSaveContent(url string, doc *goquery.Document) {
 		panic(err)
 	}
 
-	queryResult, err = db.Exec(
-		"INSERT INTO docRecord(hash) VALUES ($1)",
-		getContentHash(doc))
-	if nil != err {
-		fmt.Println(queryResult)
+	/** Region: Content check with hash
+	txn, err := db.Begin()
+	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		err := txn.Rollback()
+		if err != nil && err.Error() != "sql: transaction has already been committed or rolled back" {
+			panic(err)
+		}
+	}()
+
+	_, err = txn.Exec(
+		"INSERT INTO \"documents\"(url, title, \"timestamp\") VALUES ($1, $2, $3);",
+		url, title, time.Now())
+	if nil != err {
+		panic(err)
+	}
+
+	_, err = txn.Exec(
+		"INSERT INTO \"docRecord\"(hash) VALUES ($1);",
+		getContentHash(doc))
+	if nil != err {
+		panic(err)
+	}
+
+	err = txn.Commit()
+	if err != nil {
+		panic(err)
+	}
+	*/
 }
 
 func FilterAndGetLinks(doc *goquery.Document) *map[string]string {
