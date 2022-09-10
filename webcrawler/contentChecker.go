@@ -7,7 +7,8 @@ import (
 )
 
 func CheckDuplication(url string, doc *goquery.Document) bool {
-	var exists bool
+	//var exists bool
+	exists := false
 	// region Content check with hash
 	//hash := getContentHash(doc)
 	//
@@ -17,15 +18,6 @@ func CheckDuplication(url string, doc *goquery.Document) bool {
 	//if err != nil {
 	//	panic(err)
 	//}
-	// endregion
-
-	// region Content check with url
-	err := db.QueryRow(
-		"SELECT COUNT(*) FROM \"documents\" WHERE url=$1",
-		url).Scan(&exists)
-	if err != nil {
-		panic(err)
-	}
 	// endregion
 
 	return exists

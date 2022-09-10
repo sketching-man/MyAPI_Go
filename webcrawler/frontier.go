@@ -7,8 +7,8 @@ import (
 )
 
 var seedUrlList = [1]string{
-	//"https://news.ycombinator.com/news",
-	"https://www.bbc.com/news/world-europe-62735271",
+	"https://news.ycombinator.com/news",
+	//"https://www.bbc.com/news/world-europe-62735271",
 }
 var urlQueue datastructure.Queue
 
