@@ -23,7 +23,7 @@ func FilterAndSaveContent(url string, doc *goquery.Document) {
 		panic(err)
 	}
 
-	/** Region: Content check with hash
+	// region Content checked
 	txn, err := db.Begin()
 	if err != nil {
 		panic(err)
@@ -53,7 +53,7 @@ func FilterAndSaveContent(url string, doc *goquery.Document) {
 	if err != nil {
 		panic(err)
 	}
-	*/
+	// endregion
 }
 
 func FilterAndGetLinks(doc *goquery.Document) *map[string]string {

@@ -7,8 +7,6 @@ import (
 )
 
 func CheckDuplication(url string, doc *goquery.Document) bool {
-	//var exists bool
-	exists := false
 	// region Content check with hash
 	//hash := getContentHash(doc)
 	//
@@ -20,9 +18,11 @@ func CheckDuplication(url string, doc *goquery.Document) bool {
 	//}
 	// endregion
 
-	return exists
+	// TODO: 문서 단위로 중복 판별하는 방법을 구현해야 함
+	return false
 }
 
+// 문서의 Hash 값은 같은 문서라도 시간이 다르면 달라지는 것을 확인. 믿을 수 없는 값.
 func getContentHash(doc *goquery.Document) uint32 {
 	html, err := doc.Html()
 	if err != nil {
